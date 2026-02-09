@@ -1,0 +1,12 @@
+---
+apiVersion: console.openshift.io/v1
+kind: ConsoleLink
+metadata:
+  name: devspaces-{{ devspaces_ocp_install_instance['instance_name'] }}
+spec:
+  applicationMenu:
+    imageURL: data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI0VFMDAwMCIgZD0iTTEyIDJDNi40OCAyIDIgNi40OCAyIDEyczQuNDggMTAgMTAgMTAgMTAtNC40OCAxMC0xMFMxNy41MiAyIDEyIDJ6bTAgMThjLTQuNDEgMC04LTMuNTktOC04czMuNTktOCA4LTggOCAzLjU5IDggOC0zLjU5IDgtOCA4eiIvPjxwYXRoIGZpbGw9Im5vbmUiIGQ9Ik0wIDBoMjR2MjRIMHoiLz48L3N2Zz4=
+    section: Red Hat Applications
+  href: {{ __devspaces_ocp_install_dashboard_url }}
+  location: ApplicationMenu
+  text: {{ devspaces_ocp_install_instance['link_text'] | default('Dev Spaces (' + devspaces_ocp_install_instance['instance_name'] + ')') }}

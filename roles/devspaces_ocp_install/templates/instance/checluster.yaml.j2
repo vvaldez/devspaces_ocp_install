@@ -1,0 +1,14 @@
+---
+apiVersion: org.eclipse.che/v2
+kind: CheCluster
+metadata:
+  name: {{ devspaces_ocp_install_instance['instance_name'] }}
+  namespace: {{ devspaces_ocp_install_namespace }}
+spec:
+  components:
+    cheServer:
+      debug: {{ devspaces_ocp_install_instance['debug'] | default(false) | bool }}
+  containerRegistry: {}
+  devEnvironments:
+    storage:
+      pvcStrategy: {{ devspaces_ocp_install_instance['storage_pvc_strategy'] | default('per-user') }}

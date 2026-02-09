@@ -1,0 +1,176 @@
+---
+argument_specs:
+  main:
+    short_description: Install OpenShift Dev Spaces on OpenShift using the operator
+    description:
+      - This role installs and configures OpenShift Dev Spaces on an OpenShift cluster
+      - It handles operator installation, CheCluster instance creation, and OCP console integration
+      - Supports both username/password and API token authentication
+    author:
+      - Vinny Valdez <vvaldez@redhat.com>
+
+    options:
+      devspaces_ocp_install_connection:
+        description:
+          - Connection parameters for authenticating to the OpenShift cluster
+          - Must provide either username/password OR api_key (not both)
+        type: dict
+        required: true
+        options:
+          host:
+            description: OpenShift cluster API URL
+            type: str
+            required: true
+          username:
+            description:
+              - Username for OpenShift authentication
+              - Required when api_key is not provided
+              - Cannot be used together with api_key
+            type: str
+            required: false
+          password:
+            description:
+              - Password for OpenShift authentication
+              - Required when api_key is not provided
+              - Cannot be used together with api_key
+            type: str
+            required: false
+          api_key:
+            description:
+              - OpenShift API token for authentication
+              - Required when username/password are not provided
+              - Cannot be used together with username/password
+            type: str
+            required: false
+          validate_certs:
+            description: Whether to validate SSL certificates when connecting to OpenShift
+            type: bool
+            required: false
+            default: true
+
+      devspaces_ocp_install_namespace:
+        description:
+          - Namespace where Dev Spaces operator and instance will be installed
+          - Must be a valid Kubernetes namespace name (lowercase, alphanumeric, hyphens)
+        type: str
+        required: true
+
+      devspaces_ocp_install_create_namespace:
+        description: Whether to create the namespace if it doesn't exist
+        type: bool
+        required: false
+        default: true
+
+      devspaces_ocp_install_namespace_manifest_overrides:
+        description:
+          - YAML manifest overrides for the Namespace resource
+          - Merged recursively with the generated namespace manifest
+        type: dict
+        required: false
+
+      devspaces_ocp_install_operator:
+        description:
+          - Configuration for the Dev Spaces operator installation
+          - Required when installing the operator (or using --tags operator)
+        type: dict
+        required: false
+        options:
+          channel:
+            description:
+              - Operator Lifecycle Manager channel to subscribe to
+              - Common values are 'stable' or 'fast'
+            type: str
+            required: true
+          approval:
+            description:
+              - Install plan approval strategy
+              - Automatic will auto-approve updates
+              - Manual requires manual approval for updates
+            type: str
+            required: false
+            default: Automatic
+            choices:
+              - Automatic
+              - Manual
+          starting_csv:
+            description:
+              - Specific ClusterServiceVersion to start with
+              - Example "devspaces-operator.v3.10.0"
+              - If not specified, the latest in the channel will be used
+            type: str
+            required: false
+          operatorgroup_create:
+            description: Whether to create the OperatorGroup resource
+            type: bool
+            required: false
+            default: true
+          operatorgroup_manifest_overrides:
+            description:
+              - YAML manifest overrides for the OperatorGroup resource
+              - Merged recursively with the generated manifest
+            type: dict
+            required: false
+          subscription_manifest_overrides:
+            description:
+              - YAML manifest overrides for the Subscription resource
+              - Merged recursively with the generated manifest
+            type: dict
+            required: false
+
+      devspaces_ocp_install_instance:
+        description:
+          - Configuration for the CheCluster instance deployment
+          - Required when deploying an instance (or using --tags instance)
+        type: dict
+        required: false
+        options:
+          instance_name:
+            description:
+              - Name of the CheCluster custom resource
+              - Must be a valid Kubernetes resource name
+            type: str
+            required: true
+          debug:
+            description: Enable debug mode for the Dev Spaces server
+            type: bool
+            required: false
+            default: false
+          storage_pvc_strategy:
+            description:
+              - Storage strategy for workspace persistent volumes
+              - "per-user: one PVC per user"
+              - "per-workspace: one PVC per workspace"
+              - "common: shared PVC for all workspaces"
+            type: str
+            required: false
+            default: per-user
+            choices:
+              - per-user
+              - per-workspace
+              - common
+          create_link:
+            description:
+              - Whether to create an OpenShift Console application link
+              - Link appears in the Application menu of the OCP web console
+            type: bool
+            required: false
+            default: true
+          link_text:
+            description:
+              - Text to display for the console link
+              - If not specified, defaults to 'Dev Spaces (<instance_name>)'
+            type: str
+            required: false
+          instance_manifest_overrides:
+            description:
+              - YAML manifest overrides for the CheCluster resource
+              - Merged recursively with the generated manifest
+              - Use this to customize advanced Dev Spaces configuration
+            type: dict
+            required: false
+          consolelink_manifest_overrides:
+            description:
+              - YAML manifest overrides for the ConsoleLink resource
+              - Merged recursively with the generated manifest
+            type: dict
+            required: false

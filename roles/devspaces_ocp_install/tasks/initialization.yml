@@ -1,0 +1,41 @@
+---
+- name: Get OpenShift API token
+  redhat.openshift.openshift_auth:
+    host: "{{ devspaces_ocp_install_connection['host'] | mandatory }}"
+    username: "{{ devspaces_ocp_install_connection['username'] | mandatory }}"
+    password: "{{ devspaces_ocp_install_connection['password'] | mandatory }}"
+    validate_certs: "{{ devspaces_ocp_install_connection['validate_certs'] | default(omit) }}"
+  register: __devspaces_ocp_install_auth_results
+  when: devspaces_ocp_install_connection['api_key'] is not defined
+
+- name: Set authentication for provided API key
+  ansible.builtin.set_fact:
+    __devspaces_ocp_install_auth_results:
+      openshift_auth:
+        host: "{{ devspaces_ocp_install_connection['host'] | mandatory }}"
+        api_key: "{{ devspaces_ocp_install_connection['api_key'] | mandatory }}"
+        validate_certs: "{{ devspaces_ocp_install_connection['validate_certs'] | default(omit) }}"
+  when: devspaces_ocp_install_connection['api_key'] is defined
+
+- name: Include validate-connection tasks
+  ansible.builtin.include_tasks:
+    file: validate-connection.yml
+    apply:
+      tags:
+        - always
+  tags:
+    - always
+
+- name: Create namespace
+  when: devspaces_ocp_install_create_namespace | default(true) | bool
+  kubernetes.core.k8s:
+    host: "{{ __devspaces_ocp_install_auth_results['openshift_auth']['host'] }}"
+    api_key: "{{ __devspaces_ocp_install_auth_results['openshift_auth']['api_key'] }}"
+    validate_certs: "{{ devspaces_ocp_install_connection['validate_certs'] | default(omit) }}"
+    state: present
+    resource_definition: "{{ lookup('ansible.builtin.template', 'namespace.yaml.j2', template_vars=ns_vars) | from_yaml | ansible.builtin.combine(devspaces_ocp_install_namespace_manifest_overrides | default({}), recursive=true) }}"
+    apply: true
+  vars:
+    ns_vars:
+      ns_name: "{{ devspaces_ocp_install_namespace }}"
+...

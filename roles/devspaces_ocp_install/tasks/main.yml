@@ -1,0 +1,51 @@
+---
+- name: Include pre-validation tasks
+  ansible.builtin.include_tasks:
+    file: pre-validate.yml
+    apply:
+      tags:
+        - always
+  tags:
+    - always
+
+- name: OpenShift deployment tasks
+  block:
+    - name: Include OpenShift initialization tasks
+      ansible.builtin.include_tasks:
+        file: initialization.yml
+        apply:
+          tags:
+            - always
+      tags:
+        - always
+
+    - name: Include Dev Spaces operator install tasks
+      ansible.builtin.include_tasks:
+        file: install-operator.yml
+        apply:
+          tags:
+            - operator
+      when: devspaces_ocp_install_operator is defined
+      tags:
+        - operator
+
+    - name: Include Dev Spaces instance install tasks
+      ansible.builtin.include_tasks:
+        file: install-instance.yml
+        apply:
+          tags:
+            - instance
+      when: devspaces_ocp_install_instance is defined
+      tags:
+        - instance
+
+  always:
+    - name: Include OpenShift finalization tasks
+      ansible.builtin.include_tasks:
+        file: finalization.yml
+        apply:
+          tags:
+            - always
+      tags:
+        - always
+...

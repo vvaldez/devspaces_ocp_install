@@ -1,0 +1,13 @@
+---
+- name: Revoke OpenShift API token
+  when:
+    - __devspaces_ocp_install_auth_results is defined
+    - __devspaces_ocp_install_auth_results['openshift_auth'] is defined
+    - __devspaces_ocp_install_auth_results['openshift_auth']['api_key'] is defined
+    - devspaces_ocp_install_connection['api_key'] is not defined
+  redhat.openshift.openshift_auth:
+    state: absent
+    host: "{{ __devspaces_ocp_install_auth_results['openshift_auth']['host'] }}"
+    api_key: "{{ __devspaces_ocp_install_auth_results['openshift_auth']['api_key'] }}"
+  failed_when: false
+...

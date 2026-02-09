@@ -1,0 +1,130 @@
+---
+- name: Initialize validation errors fact
+  ansible.builtin.set_fact:
+    __devspaces_ocp_install_prevalidate_errors: []
+
+- name: Ensure OpenShift host variable is set (block)
+  block:
+    - name: Ensure OpenShift host variable is set
+      ansible.builtin.assert:
+        that:
+          - devspaces_ocp_install_connection['host'] is defined
+          - devspaces_ocp_install_connection['host'] | default("", true) | length > 0
+        quiet: true
+  rescue:
+    - name: Update validation errors fact - host
+      ansible.builtin.set_fact:
+        __devspaces_ocp_install_prevalidate_errors: >
+          {{ __devspaces_ocp_install_prevalidate_errors + ["devspaces_ocp_install_connection['host'] must be set"] }}
+
+- name: Ensure OpenShift username and password variables are not set when API Token set (block)
+  when: devspaces_ocp_install_connection['api_key'] is defined
+  block:
+    - name: Ensure OpenShift username and password variables are not set when API Token set
+      ansible.builtin.assert:
+        that:
+          - devspaces_ocp_install_connection['username'] is not defined
+          - devspaces_ocp_install_connection['password'] is not defined
+        quiet: true
+  rescue:
+    - name: Update validation errors fact - username/password with api_key
+      ansible.builtin.set_fact:
+        __devspaces_ocp_install_prevalidate_errors: >
+          {{ __devspaces_ocp_install_prevalidate_errors + ["devspaces_ocp_install_connection['username'] or devspaces_ocp_install_connection['password'] must not be set when devspaces_ocp_install_connection['api_key'] is set"] }}
+
+- name: Ensure OpenShift API token variable is set (block)
+  when: devspaces_ocp_install_connection['api_key'] is defined
+  block:
+    - name: Ensure OpenShift API token variable is set
+      ansible.builtin.assert:
+        that:
+          - devspaces_ocp_install_connection['api_key'] is defined
+          - devspaces_ocp_install_connection['api_key'] | default("", true) | length > 0
+        quiet: true
+  rescue:
+    - name: Update validation errors fact - api_key
+      ansible.builtin.set_fact:
+        __devspaces_ocp_install_prevalidate_errors: >
+          {{ __devspaces_ocp_install_prevalidate_errors + ["devspaces_ocp_install_connection['api_key'] must be set"] }}
+
+- name: Ensure OpenShift username variable is set (block)
+  when: devspaces_ocp_install_connection['api_key'] is not defined
+  block:
+    - name: Ensure OpenShift username variable is set
+      ansible.builtin.assert:
+        that:
+          - devspaces_ocp_install_connection['username'] is defined
+          - devspaces_ocp_install_connection['username'] | default("", true) | length > 0
+        quiet: true
+  rescue:
+    - name: Update validation errors fact - username
+      ansible.builtin.set_fact:
+        __devspaces_ocp_install_prevalidate_errors: >
+          {{ __devspaces_ocp_install_prevalidate_errors + ["devspaces_ocp_install_connection['username'] must be set"] }}
+
+- name: Ensure OpenShift password variable is set (block)
+  when: devspaces_ocp_install_connection['api_key'] is not defined
+  block:
+    - name: Ensure OpenShift password variable is set
+      ansible.builtin.assert:
+        that:
+          - devspaces_ocp_install_connection['password'] is defined
+          - devspaces_ocp_install_connection['password'] | default("", true) | length > 0
+        quiet: true
+  rescue:
+    - name: Update validation errors fact - password
+      ansible.builtin.set_fact:
+        __devspaces_ocp_install_prevalidate_errors: >
+          {{ __devspaces_ocp_install_prevalidate_errors + ["devspaces_ocp_install_connection['password'] must be set"] }}
+
+- name: Ensure OpenShift namespace variable is set (block)
+  block:
+    - name: Ensure OpenShift namespace variable is set
+      ansible.builtin.assert:
+        that:
+          - devspaces_ocp_install_namespace | default("", true) is match ('^[a-z0-9]([-a-z0-9]*[a-z0-9])?$')
+        quiet: true
+  rescue:
+    - name: Update validation errors fact - namespace
+      ansible.builtin.set_fact:
+        __devspaces_ocp_install_prevalidate_errors: >
+          {{ __devspaces_ocp_install_prevalidate_errors + ["devspaces_ocp_install_namespace must be a lowercase RFC 1123 label consisting of lower case alphanumeric characters or '-', and must start and end with an alphanumeric character (e.g. 'my-name', or '123-abc'"] }}
+
+- name: Ensure operator variables are set (block)
+  when: ( 'operator' in ansible_run_tags ) or ( 'all' in ansible_run_tags and devspaces_ocp_install_operator is defined )
+  block:
+    - name: Ensure operator channel is defined
+      ansible.builtin.assert:
+        that:
+          - devspaces_ocp_install_operator['channel'] is defined
+          - devspaces_ocp_install_operator['channel'] | default("", true) | length > 0
+        quiet: true
+  rescue:
+    - name: Update validation errors fact - operator channel
+      ansible.builtin.set_fact:
+        __devspaces_ocp_install_prevalidate_errors: >
+          {{ __devspaces_ocp_install_prevalidate_errors + ["devspaces_ocp_install_operator['channel'] must be set"] }}
+
+- name: Ensure instance variables are set (block)
+  when: ( 'instance' in ansible_run_tags ) or ( 'all' in ansible_run_tags and devspaces_ocp_install_instance is defined )
+  block:
+    - name: Ensure instance name is defined
+      ansible.builtin.assert:
+        that:
+          - devspaces_ocp_install_instance['instance_name'] is defined
+          - devspaces_ocp_install_instance['instance_name'] | default("", true) | length > 0
+        quiet: true
+  rescue:
+    - name: Update validation errors fact - instance name
+      ansible.builtin.set_fact:
+        __devspaces_ocp_install_prevalidate_errors: >
+          {{ __devspaces_ocp_install_prevalidate_errors + ["devspaces_ocp_install_instance['instance_name'] must be set"] }}
+
+- name: Ensure no validation errors found
+  ansible.builtin.debug:
+    msg:
+      - "The following errors must be fixed to continue:"
+      - "{{ __devspaces_ocp_install_prevalidate_errors }}"
+  failed_when: (__devspaces_ocp_install_prevalidate_errors | length) > 0
+  when: (__devspaces_ocp_install_prevalidate_errors | length) > 0
+...

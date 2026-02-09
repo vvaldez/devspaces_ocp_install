@@ -1,0 +1,15 @@
+---
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: devspaces
+  namespace: {{ devspaces_ocp_install_namespace }}
+spec:
+  channel: {{ devspaces_ocp_install_operator['channel'] }}
+  installPlanApproval: {{ devspaces_ocp_install_operator['approval'] | default('Automatic') }}
+  name: devspaces
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+{% if devspaces_ocp_install_operator['starting_csv'] is defined %}
+  startingCSV: {{ devspaces_ocp_install_operator['starting_csv'] }}
+{% endif %}

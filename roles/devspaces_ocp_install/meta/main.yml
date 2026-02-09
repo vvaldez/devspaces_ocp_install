@@ -1,0 +1,27 @@
+---
+galaxy_info:
+  author: Vinny Valdez <vvaldez@redhat.com>
+  description: Installs OpenShift Dev Spaces on OpenShift Container Platform (OCP)
+  company: Red Hat
+
+  license: GPL-3.0-or-later
+
+  min_ansible_version: 2.15.0
+
+  platforms:
+    - name: EL
+      versions:
+        - "7"
+        - "8"
+        - "9"
+
+  galaxy_tags:
+    - devspaces
+    - openshift
+    - che
+
+dependencies: []
+collections:
+  - redhat.openshift
+  - kubernetes.core
+...

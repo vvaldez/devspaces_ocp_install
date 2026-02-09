@@ -1,0 +1,34 @@
+---
+# Variable applicable to connecting to OpenShift
+# devspaces_ocp_install_connection:
+#   host:
+#   username:
+#   password:
+#   api_key:
+#   validate_certs:
+
+# Namespace to install into
+# devspaces_ocp_install_namespace:
+
+# Create the namespace (default: true)
+# devspaces_ocp_install_create_namespace:
+
+# Variable applicable to the operator installation
+# devspaces_ocp_install_operator:
+#   channel:
+#   approval:
+#   starting_csv:
+#   operatorgroup_create:
+#   operatorgroup_manifest_overrides:
+#   subscription_manifest_overrides:
+
+# Variable applicable to the CheCluster instance installation
+# devspaces_ocp_install_instance:
+#   instance_name:
+#   debug:
+#   storage_pvc_strategy:
+#   create_link:
+#   link_text:
+#   instance_manifest_overrides:
+#   consolelink_manifest_overrides:
+...
