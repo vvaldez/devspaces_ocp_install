@@ -1,0 +1,23 @@
+---
+- name: Install OpenShift Dev Spaces using the devspaces_ocp_install role
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  vars:
+    devspaces_ocp_install_connection:
+      host: "{{ lookup('env', 'K8S_AUTH_HOST') | default('https://api.example.com:6443', true) }}"
+      username: "{{ lookup('env', 'K8S_AUTH_USERNAME') | default('kubeadmin', true) }}"
+      password: "{{ lookup('env', 'K8S_AUTH_PASSWORD') }}"
+      validate_certs: false
+    devspaces_ocp_install_namespace: openshift-devspaces
+    devspaces_ocp_install_operator:
+      channel: stable
+    devspaces_ocp_install_instance:
+      instance_name: devspaces
+      storage_pvc_strategy: per-user
+  tasks:
+    - name: Include devspaces_ocp_install role
+      ansible.builtin.include_role:
+        name: devspaces_ocp_install
+        tasks_from: uninstall.yml
+...
