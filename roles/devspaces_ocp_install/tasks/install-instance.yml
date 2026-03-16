@@ -7,21 +7,6 @@
     state: present
     resource_definition: "{{ lookup('template', 'configmaps/workspaces.yaml.j2') | from_yaml }}"
 
-- name: Ensure Nested Podman SCC is applied
-  kubernetes.core.k8s:
-    host: "{{ __devspaces_ocp_install_auth_results['openshift_auth']['host'] }}"
-    api_key: "{{ __devspaces_ocp_install_auth_results['openshift_auth']['api_key'] }}"
-    validate_certs: "{{ devspaces_ocp_install_connection['validate_certs'] | default(omit) }}"
-    state: present
-    resource_definition: "{{ lookup('template', 'scc/devspaces-nested-podman.yaml.j2') | from_yaml }}"
-  when: devspaces_ocp_install_apply_scc | default(true)
-  register: scc_result
-
-- name: Debug SCC application status
-  ansible.builtin.debug:
-    msg: "SCC {{ devspaces_ocp_install_scc_name }} was successfully updated/created."
-  when: scc_result.changed
-
 - name: Deploy CheCluster instance
   kubernetes.core.k8s:
     host: "{{ __devspaces_ocp_install_auth_results['openshift_auth']['host'] }}"
