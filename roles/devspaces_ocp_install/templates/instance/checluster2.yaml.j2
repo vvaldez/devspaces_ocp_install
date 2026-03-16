@@ -56,7 +56,7 @@ spec:
       template: "{{ devspaces_ocp_install_namespace_template | default('<username>-devspaces') }}"
     secondsOfInactivityBeforeIdling: {{ devspaces_ocp_install_inactivity_timeout | default(3600) }}
     storage:
-      pvcStrategy: {{ devspaces_ocp_install_storage_pvc_strategy | default('per-workspace') }}
+      pvcStrategy: {{ devspaces_ocp_install_storage_pvc_strategy | default('per-user') }}
   gitServices: {{ devspaces_ocp_install_git_services_config | default({}) | to_json }}
   networking:
     auth:

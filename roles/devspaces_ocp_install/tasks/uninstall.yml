@@ -1,4 +1,12 @@
 ---
+- name: Include pre-validation tasks
+  ansible.builtin.include_tasks:
+    file: pre-validate.yml
+
+- name: Include OpenShift initialization tasks
+  ansible.builtin.include_tasks:
+    file: initialization.yml
+
 - name: Remove stale CheCluster CRD (if exists)
   kubernetes.core.k8s:
     host: "{{ __devspaces_ocp_install_auth_results['openshift_auth']['host'] }}"

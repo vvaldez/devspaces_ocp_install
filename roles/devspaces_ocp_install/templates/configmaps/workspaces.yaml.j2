@@ -1,0 +1,12 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ devspaces_ocp_install_samples_cm_name | default('getting-started-samples') }}
+  namespace: {{ devspaces_ocp_install_namespace }}
+  labels:
+    app.kubernetes.io/part-of: che.eclipse.org
+    app.kubernetes.io/component: getting-started-samples
+data:
+  exercise-samples.json: |
+    {{ devspaces_ocp_install_samples_content | to_nice_json(indent=2) | indent(4) }}
