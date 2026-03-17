@@ -55,14 +55,4 @@
 - name: Display Dev Spaces URL
   ansible.builtin.debug:
     msg: "Dev Spaces is ready! Access the dashboard at: {{ __devspaces_ocp_install_dashboard_url }}"
-
-- name: Create OCP Console Link
-  when: devspaces_ocp_install_instance['create_link'] | default(true) | bool
-  kubernetes.core.k8s:
-    host: "{{ __devspaces_ocp_install_auth_results['openshift_auth']['host'] }}"
-    api_key: "{{ __devspaces_ocp_install_auth_results['openshift_auth']['api_key'] }}"
-    validate_certs: "{{ devspaces_ocp_install_connection['validate_certs'] | default(omit) }}"
-    state: present
-    resource_definition: "{{ lookup('template', 'instance/consolelink.yaml.j2') | from_yaml | ansible.builtin.combine(devspaces_ocp_install_instance['consolelink_manifest_overrides'] | default({}), recursive=true) }}"
-    apply: true
 ...
